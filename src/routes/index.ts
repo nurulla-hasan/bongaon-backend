@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { authRouter } from '../modules/auth/auth.routes';
 import { categoryRouter } from '../modules/category/category.routes';
+import { productRouter } from '../modules/product/product.routes';
 import { userRouter } from '../modules/user/user.routes';
 
 export const apiRouter = Router();
@@ -8,3 +9,4 @@ export const apiRouter = Router();
 apiRouter.use('/auth', authRouter);
 apiRouter.use('/users', userRouter);
 apiRouter.use('/categories', categoryRouter);
+apiRouter.use('/products', productRouter);

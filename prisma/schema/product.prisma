@@ -1,0 +1,34 @@
+model Product {
+  id            String   @id @default(uuid())
+  name          String
+  slug          String   @unique
+  shortTag      String   @default("") @map("short_tag")
+  badge         String?
+  categoryId    String   @map("category_id")
+  price         Int
+  originalPrice Int?     @map("original_price")
+  unit          String   @default("250g")
+  stock         Int      @default(0)
+  imageUrl      String   @default("") @map("image_url")
+  imagePublicId String   @default("") @map("image_public_id")
+  gallery       Json     @default("[]")
+  deliveryDays  String   @default("4-7 Days") @map("delivery_days")
+  shelfLife     String   @default("") @map("shelf_life")
+  origin        String   @default("")
+  description   String   @db.Text
+  highlights    String[] @default([])
+  ingredients   String[] @default([])
+  packOptions   Json     @default("[]") @map("pack_options")
+  rating        Float    @default(0)
+  reviewCount   Int      @default(0) @map("review_count")
+  isFeatured    Boolean  @default(false) @map("is_featured")
+  isActive      Boolean  @default(true) @map("is_active")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  @@index([categoryId, isActive])
+  @@index([isFeatured, isActive])
+  @@map("products")
+}
