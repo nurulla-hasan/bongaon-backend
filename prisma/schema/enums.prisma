@@ -20,3 +20,10 @@ enum OrderStatus {
   DELIVERED
   CANCELLED
 }
+
+enum ContactStatus {
+  NEW
+  READ
+  REPLIED
+  ARCHIVED
+}

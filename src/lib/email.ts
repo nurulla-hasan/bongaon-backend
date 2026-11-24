@@ -77,3 +77,39 @@ export const sendPasswordResetEmail = async (
     html,
   });
 };
+
+export const sendContactReplyEmail = async (params: {
+  email: string;
+  name: string;
+  subject: string;
+  originalMessage: string;
+  replyMessage: string;
+}): Promise<void> => {
+  const { email, name, subject, originalMessage, replyMessage } = params;
+
+  if (!transporter) {
+    if (config.node_env === 'production') throw new Error('Email service is not configured');
+    console.log(`\n========================================`);
+    console.log(`[DEV EMAIL] Contact reply to ${email}`);
+    console.log(`Subject: ${subject}`);
+    console.log(`Reply: ${replyMessage}`);
+    console.log(`========================================\n`);
+    return;
+  }
+
+  const templatePath = path.join(process.cwd(), 'src/templates/contact-reply.ejs');
+
+  const html = await ejs.renderFile(templatePath, {
+    name,
+    originalMessage,
+    replyMessage,
+  });
+
+  await transporter.sendMail({
+    from: config.email_sender || 'Bongaon Bajar <no-reply@bongaonbajar.com>',
+    to: email,
+    subject,
+    text: `${replyMessage}\n\n---\nYour original message:\n${originalMessage}`,
+    html,
+  });
+};

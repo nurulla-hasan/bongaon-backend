@@ -1,0 +1,17 @@
+model ContactMessage {
+  id        String        @id @default(uuid())
+  name      String
+  phone     String
+  email     String        @default("")
+  subject   String        @default("")
+  message     String        @db.Text
+  status      ContactStatus @default(NEW)
+  adminReply  String        @default("") @map("admin_reply") @db.Text
+  repliedAt   DateTime?     @map("replied_at")
+  repliedById String?       @map("replied_by_id")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+
+  @@index([status, createdAt])
+  @@map("contact_messages")
+}

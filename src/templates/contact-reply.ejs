@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reply from Bongaon Bajar</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f8fafc;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: #1e293b;
+    }
+    .wrapper {
+      width: 100%;
+      table-layout: fixed;
+      background-color: #f8fafc;
+      padding: 40px 0;
+    }
+    .main-table {
+      max-width: 560px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+    .header {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      padding: 28px 24px;
+      text-align: center;
+    }
+    .brand-title {
+      color: #ffffff;
+      font-size: 22px;
+      font-weight: 700;
+      margin: 0;
+    }
+    .brand-sub {
+      color: #94a3b8;
+      font-size: 12px;
+      margin: 6px 0 0;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .content {
+      padding: 32px;
+    }
+    .greeting {
+      font-size: 17px;
+      font-weight: 600;
+      color: #0f172a;
+      margin: 0 0 12px;
+    }
+    .reply-box {
+      font-size: 14px;
+      line-height: 1.7;
+      color: #1e293b;
+      background: #f8fafc;
+      border-left: 4px solid #10b981;
+      padding: 16px 18px;
+      border-radius: 6px;
+      margin: 16px 0 24px;
+      white-space: pre-line;
+    }
+    .original-box {
+      background: #f1f5f9;
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-size: 12px;
+      color: #475569;
+      line-height: 1.5;
+    }
+    .original-label {
+      font-weight: 600;
+      color: #334155;
+      margin: 0 0 6px;
+    }
+    .footer {
+      background-color: #f1f5f9;
+      padding: 20px 32px;
+      text-align: center;
+      border-top: 1px solid #e2e8f0;
+    }
+    .footer-text {
+      font-size: 12px;
+      color: #64748b;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <table class="main-table" cellpadding="0" cellspacing="0" width="100%">
+      <tr>
+        <td class="header">
+          <h1 class="brand-title">Bongaon Bajar</h1>
+          <p class="brand-sub">Customer Support Reply</p>
+        </td>
+      </tr>
+      <tr>
+        <td class="content">
+          <p class="greeting">Hello <%= name %>,</p>
+          <div class="reply-box"><%= replyMessage %></div>
+          <div class="original-box">
+            <p class="original-label">Your original message:</p>
+            <p style="margin: 0;"><%= originalMessage %></p>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td class="footer">
+          <p class="footer-text">
+            &copy; <%= new Date().getFullYear() %> Bongaon Bajar. All rights reserved.
+          </p>
+        </td>
+      </tr>
+    </table>
+  </div>
+</body>
+</html>
