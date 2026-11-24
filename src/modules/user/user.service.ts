@@ -252,10 +252,52 @@ const uploadProfileImageIntoDB = async (userId: string, file?: Express.Multer.Fi
 };
 
 const getDashboardStatsFromDB = async () => {
-  const [totalUsers, totalAdmins, blockedUsers] = await Promise.all([
+  const [
+    totalUsers,
+    totalAdmins,
+    blockedUsers,
+    totalCategories,
+    totalProducts,
+    activeProducts,
+    lowStockProducts,
+    totalOrders,
+    pendingOrders,
+    processingOrders,
+    inTransitOrders,
+    deliveredOrders,
+    cancelledOrders,
+    deliveredRevenueAgg,
+    activeOrderValueAgg,
+    totalReviews,
+    pendingReviews,
+    totalContacts,
+    unreadContacts,
+  ] = await Promise.all([
     prisma.user.count({ where: { role: 'USER' } }),
     prisma.user.count({ where: { role: 'ADMIN' } }),
     prisma.user.count({ where: { status: 'BLOCKED' } }),
+    prisma.category.count(),
+    prisma.product.count(),
+    prisma.product.count({ where: { isActive: true } }),
+    prisma.product.count({ where: { isActive: true, stock: { lte: 5 } } }),
+    prisma.order.count(),
+    prisma.order.count({ where: { status: 'PENDING' } }),
+    prisma.order.count({ where: { status: 'PROCESSING' } }),
+    prisma.order.count({ where: { status: 'IN_TRANSIT' } }),
+    prisma.order.count({ where: { status: 'DELIVERED' } }),
+    prisma.order.count({ where: { status: 'CANCELLED' } }),
+    prisma.order.aggregate({
+      where: { status: 'DELIVERED' },
+      _sum: { total: true },
+    }),
+    prisma.order.aggregate({
+      where: { status: { in: ['PENDING', 'PROCESSING', 'IN_TRANSIT'] } },
+      _sum: { total: true },
+    }),
+    prisma.review.count(),
+    prisma.review.count({ where: { isApproved: false } }),
+    prisma.contactMessage.count(),
+    prisma.contactMessage.count({ where: { status: 'NEW' } }),
   ]);
 
   return {
@@ -264,6 +306,30 @@ const getDashboardStatsFromDB = async () => {
       users: totalUsers,
       admins: totalAdmins,
       blocked: blockedUsers,
+    },
+    catalog: {
+      categories: totalCategories,
+      products: totalProducts,
+      activeProducts,
+      lowStockProducts,
+    },
+    orders: {
+      total: totalOrders,
+      pending: pendingOrders,
+      processing: processingOrders,
+      inTransit: inTransitOrders,
+      delivered: deliveredOrders,
+      cancelled: cancelledOrders,
+      totalRevenue: deliveredRevenueAgg._sum.total ?? 0,
+      activeOrderValue: activeOrderValueAgg._sum.total ?? 0,
+    },
+    reviews: {
+      total: totalReviews,
+      pendingApproval: pendingReviews,
+    },
+    contacts: {
+      total: totalContacts,
+      unread: unreadContacts,
     },
   };
 };
