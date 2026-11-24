@@ -28,6 +28,7 @@ model Product {
 
   category   Category    @relation(fields: [categoryId], references: [id], onDelete: Restrict)
   orderItems OrderItem[]
+  reviews    Review[]
 
   @@index([categoryId, isActive])
   @@index([isFeatured, isActive])

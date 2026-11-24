@@ -1,0 +1,19 @@
+model Review {
+  id           String   @id @default(uuid())
+  productId    String   @map("product_id")
+  userId       String?  @map("user_id")
+  customerName String   @map("customer_name")
+  location     String   @default("")
+  rating       Int
+  comment      String   @db.Text
+  isApproved   Boolean  @default(true) @map("is_approved")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user    User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([productId, isApproved, createdAt])
+  @@index([isApproved, createdAt])
+  @@map("reviews")
+}
