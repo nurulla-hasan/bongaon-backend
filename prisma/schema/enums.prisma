@@ -12,3 +12,11 @@ enum AuthProvider {
   CREDENTIAL
   GOOGLE
 }
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  IN_TRANSIT
+  DELIVERED
+  CANCELLED
+}

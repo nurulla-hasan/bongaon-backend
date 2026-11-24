@@ -1,0 +1,46 @@
+model Order {
+  id             String      @id @default(uuid())
+  orderNumber    String      @unique @map("order_number")
+  userId         String?     @map("user_id")
+  receiverName   String      @map("receiver_name")
+  receiverPhone  String      @map("receiver_phone")
+  district       String
+  fullAddress    String      @map("full_address") @db.Text
+  whatsappNumber String      @default("") @map("whatsapp_number")
+  orderNote      String      @default("") @map("order_note")
+  subtotal       Int
+  deliveryCharge Int         @map("delivery_charge")
+  total          Int
+  paymentMethod  String      @default("COD") @map("payment_method")
+  status         OrderStatus @default(PENDING)
+  createdAt      DateTime    @default(now()) @map("created_at")
+  updatedAt      DateTime    @updatedAt @map("updated_at")
+
+  user  User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  items OrderItem[]
+
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+  @@index([receiverPhone])
+  @@map("orders")
+}
+
+model OrderItem {
+  id           String @id @default(uuid())
+  orderId      String @map("order_id")
+  productId    String @map("product_id")
+  productName  String @map("product_name")
+  productSlug  String @map("product_slug")
+  productImage String @default("") @map("product_image")
+  selectedPack String @map("selected_pack")
+  quantity     Int
+  unitPrice    Int    @map("unit_price")
+  lineTotal    Int    @map("line_total")
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@index([orderId])
+  @@index([productId])
+  @@map("order_items")
+}

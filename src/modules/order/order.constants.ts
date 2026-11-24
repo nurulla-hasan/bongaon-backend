@@ -1,0 +1,2 @@
+export const DEFAULT_DELIVERY_CHARGE_BDT = 120;
+export const ORDER_PAYMENT_METHOD = 'COD';
