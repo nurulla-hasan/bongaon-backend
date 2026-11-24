@@ -1,9 +1,10 @@
 import bcrypt from 'bcryptjs';
 import httpStatus from 'http-status';
-import { AuthProvider, type Prisma, type Role } from '../../../generated/prisma/client';
+import { AuthProvider, type Prisma, type Role, UserStatus } from '../../../generated/prisma/client';
 import { deleteFromCloudinary, uploadToCloudinary } from '../../lib/cloudinary';
 import { prisma } from '../../lib/prisma';
 import { AppError } from '../../utils/app-error';
+import { buildPaginationMeta, calculatePagination } from '../../utils/pagination';
 import type {
   CreateAdminInput,
   GetUsersQueryInput,
@@ -13,9 +14,7 @@ import type {
 
 const getAllUsersFromDB = async (query: GetUsersQueryInput, currentUserId?: string) => {
   const { page, limit, searchTerm, role, status, sortBy } = query;
-  const pageNum = Math.max(1, Number(page) || 1);
-  const limitNum = Math.max(1, Number(limit) || 10);
-  const skip = (pageNum - 1) * limitNum;
+  const { page: pageNum, limit: limitNum, skip } = calculatePagination({ page, limit });
 
   const andConditions: Prisma.UserWhereInput[] = [];
 
@@ -76,12 +75,7 @@ const getAllUsersFromDB = async (query: GetUsersQueryInput, currentUserId?: stri
   ]);
 
   return {
-    meta: {
-      page: pageNum,
-      limit: limitNum,
-      total,
-      totalPages: Math.ceil(total / limitNum),
-    },
+    meta: buildPaginationMeta(pageNum, limitNum, total),
     data: rawUsers,
   };
 };
@@ -127,7 +121,7 @@ const createAdminIntoDB = async (payload: CreateAdminInput) => {
       password: passwordHash,
       phone: payload.phone ?? '',
       role: payload.role as Role,
-      status: 'ACTIVE',
+      status: UserStatus.ACTIVE,
       emailVerified: true,
       authProvider: AuthProvider.CREDENTIAL,
     },

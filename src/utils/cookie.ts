@@ -1,8 +1,7 @@
 import type { Response } from 'express';
 import config from '../config/index';
 
-const isHttps = Boolean(config.frontend_url && config.frontend_url.startsWith('https://'));
-const isProduction = config.node_env === 'production' && isHttps;
+const isProduction = config.node_env === 'production';
 
 export const authCookieOptions = {
   httpOnly: true,

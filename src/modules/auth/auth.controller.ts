@@ -50,7 +50,6 @@ const loginUser = catchAsync(async (req, res) => {
     statusCode: httpStatus.OK,
     message: 'Login successful',
     data: {
-      user: req.user,
       accessToken: result.accessToken,
     },
   });

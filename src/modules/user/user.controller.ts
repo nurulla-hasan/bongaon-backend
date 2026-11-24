@@ -7,7 +7,7 @@ import type { GetUsersQueryInput } from './user.validation';
 
 const getAllUsers: RequestHandler = catchAsync(async (req, res) => {
   const result = await userService.getAllUsersFromDB(
-    req.query as unknown as GetUsersQueryInput,
+    (req.validatedQuery ?? req.query) as GetUsersQueryInput,
     req.user?.id,
   );
 

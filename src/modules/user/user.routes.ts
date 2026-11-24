@@ -1,9 +1,14 @@
 import { Router } from 'express';
 import { upload } from '../../lib/multer';
 import { auth } from '../../middlewares/auth';
-import { validate } from '../../middlewares/validate';
+import { validate, validateQuery } from '../../middlewares/validate';
 import { userController } from './user.controller';
-import { createAdminSchema, updateUserRoleSchema, updateUserStatusSchema } from './user.validation';
+import {
+  createAdminSchema,
+  getUsersQuerySchema,
+  updateUserRoleSchema,
+  updateUserStatusSchema,
+} from './user.validation';
 
 export const userRouter = Router();
 
@@ -16,7 +21,7 @@ userRouter.patch(
 );
 
 // Get all users (Admin)
-userRouter.get('/', auth('ADMIN'), userController.getAllUsers);
+userRouter.get('/', auth('ADMIN'), validateQuery(getUsersQuerySchema), userController.getAllUsers);
 
 // Get system dashboard stats (Admin)
 userRouter.get('/admin/dashboard-stats', auth('ADMIN'), userController.getDashboardStats);
