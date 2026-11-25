@@ -14,6 +14,11 @@ export const getProductsQuerySchema = z.object({
   categorySlug: z.string().trim().optional(),
   minPrice: z.coerce.number().int().min(0).optional(),
   maxPrice: z.coerce.number().int().min(0).optional(),
+  minRating: z.coerce.number().min(0).max(5).optional(),
+  onlyDiscounted: z
+    .enum(['true', 'false'])
+    .transform((val) => val === 'true')
+    .optional(),
   isFeatured: z
     .enum(['true', 'false'])
     .transform((val) => val === 'true')
@@ -25,7 +30,7 @@ export const getProductsQuerySchema = z.object({
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().positive().max(100).default(10),
   sortBy: z
-    .enum(['newest', 'oldest', 'price_asc', 'price_desc', 'rating_desc', 'name_asc'])
+    .enum(['popular', 'newest', 'oldest', 'price_asc', 'price_desc', 'rating_desc', 'name_asc'])
     .default('newest'),
 });
 

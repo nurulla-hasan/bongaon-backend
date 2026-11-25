@@ -61,6 +61,7 @@ const PRODUCT_PUBLIC_SELECT = {
 } satisfies Prisma.ProductSelect;
 
 const PRODUCT_ORDER_BY_MAP: Record<string, Prisma.ProductOrderByWithRelationInput[]> = {
+  popular: [{ reviewCount: 'desc' }, { rating: 'desc' }],
   newest: [{ createdAt: 'desc' }],
   oldest: [{ createdAt: 'asc' }],
   price_asc: [{ price: 'asc' }],
@@ -148,6 +149,8 @@ const getAllProductsFromDB = async (query: GetProductsQueryInput) => {
     categorySlug,
     minPrice,
     maxPrice,
+    minRating,
+    onlyDiscounted,
     isFeatured,
     isActive,
     sortBy,
@@ -183,6 +186,14 @@ const getAllProductsFromDB = async (query: GetProductsQueryInput) => {
         ...(maxPrice !== undefined && { lte: maxPrice }),
       },
     });
+  }
+
+  if (minRating !== undefined && minRating > 0) {
+    andConditions.push({ rating: { gte: minRating } });
+  }
+
+  if (onlyDiscounted) {
+    andConditions.push({ originalPrice: { not: null } });
   }
 
   if (typeof isFeatured === 'boolean') {

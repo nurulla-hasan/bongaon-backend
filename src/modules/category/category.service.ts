@@ -28,6 +28,13 @@ const CATEGORY_PUBLIC_SELECT = {
   sortOrder: true,
   isActive: true,
   showOnHome: true,
+  _count: {
+    select: {
+      products: {
+        where: { isActive: true },
+      },
+    },
+  },
   createdAt: true,
   updatedAt: true,
 } satisfies Prisma.CategorySelect;
