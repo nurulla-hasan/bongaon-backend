@@ -10,6 +10,7 @@ model StoreSetting {
   estimatedDeliveryDays String   @default("4-7 Days") @map("estimated_delivery_days")
   announcementEnabled   Boolean  @default(false) @map("announcement_enabled")
   announcementText      String   @default("") @map("announcement_text")
+  heroBanners           Json     @default("[]") @map("hero_banners")
   isOrderingEnabled     Boolean  @default(true) @map("is_ordering_enabled")
   orderAlertEmail       String   @default("") @map("order_alert_email")
   updatedAt             DateTime @updatedAt @map("updated_at")
