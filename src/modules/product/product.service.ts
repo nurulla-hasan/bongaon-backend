@@ -419,10 +419,73 @@ const deleteProductFromDB = async (id: string) => {
   return { message: 'Product deleted successfully' };
 };
 
+const getHomeSectionsFromDB = async () => {
+  const [categories, featuredProducts, showcaseCategories] = await Promise.all([
+    prisma.category.findMany({
+      where: { isActive: true },
+      orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        subtitle: true,
+        imageUrl: true,
+        sortOrder: true,
+        isActive: true,
+        showOnHome: true,
+        _count: {
+          select: {
+            products: {
+              where: { isActive: true },
+            },
+          },
+        },
+      },
+    }),
+    prisma.product.findMany({
+      where: { isActive: true, isFeatured: true },
+      orderBy: [{ createdAt: 'desc' }],
+      take: 10,
+      select: PRODUCT_PUBLIC_SELECT,
+    }),
+    prisma.category.findMany({
+      where: { isActive: true, showOnHome: true },
+      orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        subtitle: true,
+        imageUrl: true,
+        products: {
+          where: { isActive: true },
+          orderBy: [{ createdAt: 'desc' }],
+          take: 10,
+          select: PRODUCT_PUBLIC_SELECT,
+        },
+      },
+    }),
+  ]);
+
+  const showcases = showcaseCategories
+    .filter((category) => category.products.length > 0)
+    .map(({ products, ...category }) => ({
+      category,
+      products,
+    }));
+
+  return {
+    categories,
+    featuredProducts,
+    showcases,
+  };
+};
+
 export const productService = {
   createProductIntoDB,
   getAllProductsFromDB,
   getProductByIdOrSlugFromDB,
+  getHomeSectionsFromDB,
   updateProductIntoDB,
   uploadProductImageIntoDB,
   uploadProductGalleryIntoDB,

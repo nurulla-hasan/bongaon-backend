@@ -12,6 +12,9 @@ import {
 
 export const productRouter = Router();
 
+// Get home page sections: categories, featured products, and showcase categories (Public)
+productRouter.get('/home', productController.getHomeSections);
+
 // Get all products (Public)
 productRouter.get('/', validateQuery(getProductsQuerySchema), productController.getAllProducts);
 

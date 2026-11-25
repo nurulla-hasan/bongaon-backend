@@ -24,10 +24,10 @@ const CATEGORY_PUBLIC_SELECT = {
   name: true,
   slug: true,
   subtitle: true,
-  iconName: true,
   imageUrl: true,
   sortOrder: true,
   isActive: true,
+  showOnHome: true,
   createdAt: true,
   updatedAt: true,
 } satisfies Prisma.CategorySelect;
@@ -66,9 +66,9 @@ const createCategoryIntoDB = async (payload: CreateCategoryInput) => {
       name: payload.name,
       slug,
       subtitle: payload.subtitle ?? '',
-      iconName: payload.iconName ?? 'package',
       sortOrder: payload.sortOrder ?? 0,
       isActive: payload.isActive ?? true,
+      showOnHome: payload.showOnHome ?? false,
     },
     select: CATEGORY_PUBLIC_SELECT,
   });
@@ -77,7 +77,7 @@ const createCategoryIntoDB = async (payload: CreateCategoryInput) => {
 };
 
 const getAllCategoriesFromDB = async (query: GetCategoriesQueryInput) => {
-  const { page, limit, searchTerm, isActive, sortBy } = query;
+  const { page, limit, searchTerm, isActive, showOnHome, sortBy } = query;
   const { page: pageNum, limit: limitNum, skip } = calculatePagination({ page, limit });
 
   const andConditions: Prisma.CategoryWhereInput[] = [];
@@ -95,6 +95,10 @@ const getAllCategoriesFromDB = async (query: GetCategoriesQueryInput) => {
 
   if (typeof isActive === 'boolean') {
     andConditions.push({ isActive });
+  }
+
+  if (typeof showOnHome === 'boolean') {
+    andConditions.push({ showOnHome });
   }
 
   const whereCondition: Prisma.CategoryWhereInput =
@@ -177,9 +181,9 @@ const updateCategoryIntoDB = async (id: string, payload: UpdateCategoryInput) =>
       ...(payload.name !== undefined && { name: payload.name }),
       ...(nextSlug !== undefined && { slug: nextSlug }),
       ...(payload.subtitle !== undefined && { subtitle: payload.subtitle }),
-      ...(payload.iconName !== undefined && { iconName: payload.iconName }),
       ...(payload.sortOrder !== undefined && { sortOrder: payload.sortOrder }),
       ...(payload.isActive !== undefined && { isActive: payload.isActive }),
+      ...(payload.showOnHome !== undefined && { showOnHome: payload.showOnHome }),
     },
     select: CATEGORY_PUBLIC_SELECT,
   });

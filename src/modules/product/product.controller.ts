@@ -100,10 +100,22 @@ const deleteProduct: RequestHandler = catchAsync(async (req, res) => {
   });
 });
 
+const getHomeSections: RequestHandler = catchAsync(async (_req, res) => {
+  const result = await productService.getHomeSectionsFromDB();
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Home sections retrieved successfully',
+    data: result,
+  });
+});
+
 export const productController = {
   createProduct,
   getAllProducts,
   getProductByIdOrSlug,
+  getHomeSections,
   updateProduct,
   uploadProductImage,
   uploadProductGallery,

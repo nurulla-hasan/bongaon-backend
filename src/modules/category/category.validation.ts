@@ -8,6 +8,10 @@ export const getCategoriesQuerySchema = z.object({
     .enum(['true', 'false'])
     .transform((val) => val === 'true')
     .optional(),
+  showOnHome: z
+    .enum(['true', 'false'])
+    .transform((val) => val === 'true')
+    .optional(),
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().positive().max(100).default(10),
   sortBy: z.enum(['sort_order', 'newest', 'oldest', 'name_asc', 'name_desc']).default('sort_order'),
@@ -27,9 +31,9 @@ export const createCategorySchema = z.object({
     .regex(slugRegex, 'Slug must be lowercase alphanumeric with hyphens.')
     .optional(),
   subtitle: z.string().trim().max(255).optional().default(''),
-  iconName: z.string().trim().max(50).optional().default('package'),
   sortOrder: z.coerce.number().int().min(0).optional().default(0),
   isActive: z.boolean().optional().default(true),
+  showOnHome: z.boolean().optional().default(false),
 });
 
 export const updateCategorySchema = z.object({
@@ -47,9 +51,9 @@ export const updateCategorySchema = z.object({
     .regex(slugRegex, 'Slug must be lowercase alphanumeric with hyphens.')
     .optional(),
   subtitle: z.string().trim().max(255).optional(),
-  iconName: z.string().trim().max(50).optional(),
   sortOrder: z.coerce.number().int().min(0).optional(),
   isActive: z.boolean().optional(),
+  showOnHome: z.boolean().optional(),
 });
 
 export type GetCategoriesQueryInput = z.infer<typeof getCategoriesQuerySchema>;

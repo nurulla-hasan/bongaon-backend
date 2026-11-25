@@ -3,16 +3,17 @@ model Category {
   name          String   @unique
   slug          String   @unique
   subtitle      String   @default("")
-  iconName      String   @default("package") @map("icon_name")
   imageUrl      String   @default("") @map("image_url")
   imagePublicId String   @default("") @map("image_public_id")
   sortOrder     Int      @default(0) @map("sort_order")
   isActive      Boolean  @default(true) @map("is_active")
+  showOnHome    Boolean  @default(false) @map("show_on_home")
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
 
   products Product[]
 
   @@index([isActive, sortOrder])
+  @@index([isActive, showOnHome, sortOrder])
   @@map("categories")
 }
