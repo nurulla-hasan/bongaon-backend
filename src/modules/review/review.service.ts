@@ -67,6 +67,38 @@ const createReviewIntoDB = async (payload: CreateReviewInput, userId?: string) =
     throw new AppError(httpStatus.NOT_FOUND, 'Product not found or inactive');
   }
 
+  if (!userId && !payload.phone) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Please sign in or provide your order phone number to submit a review',
+    );
+  }
+
+  const deliveredOrder = await prisma.order.findFirst({
+    where: {
+      status: 'DELIVERED',
+      items: {
+        some: {
+          productId: payload.productId,
+        },
+      },
+      ...(userId
+        ? { userId }
+        : {
+            receiverPhone: payload.phone,
+            ...(payload.orderNumber && { orderNumber: payload.orderNumber }),
+          }),
+    },
+    select: { id: true },
+  });
+
+  if (!deliveredOrder) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      'You can only review a product after your order has been delivered',
+    );
+  }
+
   const review = await prisma.$transaction(async (tx) => {
     const created = await tx.review.create({
       data: {
@@ -157,9 +189,7 @@ const updateReviewIntoDB = async (id: string, payload: UpdateReviewInput) => {
     const review = await tx.review.update({
       where: { id },
       data: {
-        ...(payload.isApproved !== undefined && { isApproved: payload.isApproved }),
-        ...(payload.rating !== undefined && { rating: payload.rating }),
-        ...(payload.comment !== undefined && { comment: payload.comment }),
+        isApproved: payload.isApproved,
       },
       select: REVIEW_PUBLIC_SELECT,
     });
