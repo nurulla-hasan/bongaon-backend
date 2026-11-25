@@ -5,6 +5,7 @@ import { contactRouter } from '../modules/contact/contact.routes';
 import { orderRouter } from '../modules/order/order.routes';
 import { productRouter } from '../modules/product/product.routes';
 import { reviewRouter } from '../modules/review/review.routes';
+import { settingRouter } from '../modules/setting/setting.routes';
 import { userRouter } from '../modules/user/user.routes';
 
 export const apiRouter = Router();
@@ -16,3 +17,4 @@ apiRouter.use('/products', productRouter);
 apiRouter.use('/orders', orderRouter);
 apiRouter.use('/reviews', reviewRouter);
 apiRouter.use('/contacts', contactRouter);
+apiRouter.use('/settings', settingRouter);

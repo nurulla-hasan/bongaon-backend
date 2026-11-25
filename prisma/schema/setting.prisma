@@ -1,0 +1,18 @@
+model StoreSetting {
+  id                    String   @id @default("default")
+  storeName             String   @default("Bongaon Bazar") @map("store_name")
+  supportPhone          String   @default("") @map("support_phone")
+  whatsappNumber        String   @default("") @map("whatsapp_number")
+  supportEmail          String   @default("") @map("support_email")
+  storeAddress          String   @default("") @map("store_address")
+  defaultDeliveryCharge Int      @default(120) @map("default_delivery_charge")
+  freeDeliveryMinOrder  Int      @default(0) @map("free_delivery_min_order")
+  estimatedDeliveryDays String   @default("4-7 Days") @map("estimated_delivery_days")
+  announcementEnabled   Boolean  @default(false) @map("announcement_enabled")
+  announcementText      String   @default("") @map("announcement_text")
+  isOrderingEnabled     Boolean  @default(true) @map("is_ordering_enabled")
+  orderAlertEmail       String   @default("") @map("order_alert_email")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  @@map("store_settings")
+}

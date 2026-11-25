@@ -180,7 +180,28 @@ const createOrderIntoDB = async (payload: CreateOrderInput, userId?: string) => 
       };
     });
 
-    const deliveryCharge = DEFAULT_DELIVERY_CHARGE_BDT;
+    const storeSetting = await tx.storeSetting.findUnique({
+      where: { id: 'default' },
+      select: {
+        defaultDeliveryCharge: true,
+        freeDeliveryMinOrder: true,
+        isOrderingEnabled: true,
+      },
+    });
+
+    if (storeSetting && !storeSetting.isOrderingEnabled) {
+      throw new AppError(
+        httpStatus.SERVICE_UNAVAILABLE,
+        'Orders are temporarily paused. Please try again later.',
+      );
+    }
+
+    const baseDeliveryCharge =
+      storeSetting?.defaultDeliveryCharge ?? DEFAULT_DELIVERY_CHARGE_BDT;
+    const isFreeDelivery =
+      Boolean(storeSetting && storeSetting.freeDeliveryMinOrder > 0) &&
+      subtotal >= (storeSetting?.freeDeliveryMinOrder ?? 0);
+    const deliveryCharge = isFreeDelivery ? 0 : baseDeliveryCharge;
     const total = subtotal + deliveryCharge;
 
     return tx.order.create({
