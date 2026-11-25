@@ -238,7 +238,35 @@ const getProductByIdOrSlugFromDB = async (idOrSlug: string) => {
     throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
   }
 
-  return product;
+  const sameCategory = await prisma.product.findMany({
+    where: {
+      isActive: true,
+      id: { not: product.id },
+      categoryId: product.categoryId,
+    },
+    take: 5,
+    orderBy: [{ reviewCount: 'desc' }, { rating: 'desc' }],
+    select: PRODUCT_PUBLIC_SELECT,
+  });
+
+  const remaining = 5 - sameCategory.length;
+  const fallbackProducts =
+    remaining > 0
+      ? await prisma.product.findMany({
+          where: {
+            isActive: true,
+            id: { notIn: [product.id, ...sameCategory.map((item) => item.id)] },
+          },
+          take: remaining,
+          orderBy: [{ reviewCount: 'desc' }, { rating: 'desc' }],
+          select: PRODUCT_PUBLIC_SELECT,
+        })
+      : [];
+
+  return {
+    ...product,
+    relatedProducts: [...sameCategory, ...fallbackProducts],
+  };
 };
 
 const updateProductIntoDB = async (id: string, payload: UpdateProductInput) => {
