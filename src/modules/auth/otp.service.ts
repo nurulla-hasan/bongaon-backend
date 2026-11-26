@@ -26,8 +26,8 @@ interface IPasswordResetData {
   attempts: number;
 }
 
-const getRegistrationKey = (email: string): string => `registration:${email}`;
-const getPasswordResetKey = (email: string): string => `password_reset:${email}`;
+const getRegistrationKey = (email: string): string => `bongaon:registration:${email}`;
+const getPasswordResetKey = (email: string): string => `bongaon:password_reset:${email}`;
 
 const generateOtp = (): string => {
   return randomInt(100000, 1000000).toString();
