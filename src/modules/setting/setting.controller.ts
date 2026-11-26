@@ -15,6 +15,17 @@ const getSettings: RequestHandler = catchAsync(async (_req, res) => {
   });
 });
 
+const uploadHeroBannerImage: RequestHandler = catchAsync(async (req, res) => {
+  const result = await settingService.uploadHeroBannerImageIntoCloudinary(req.file);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Hero banner image uploaded successfully',
+    data: result,
+  });
+});
+
 const updateSettings: RequestHandler = catchAsync(async (req, res) => {
   const result = await settingService.updateSettingsIntoDB(req.body);
 
@@ -28,5 +39,6 @@ const updateSettings: RequestHandler = catchAsync(async (req, res) => {
 
 export const settingController = {
   getSettings,
+  uploadHeroBannerImage,
   updateSettings,
 };

@@ -5,6 +5,7 @@ export const heroBannerSchema = z.object({
   title: z.string().trim().max(120).optional().default(''),
   subtitle: z.string().trim().max(240).optional().default(''),
   imageUrl: z.string().trim().min(1, 'Banner image URL is required').max(500),
+  imagePublicId: z.string().trim().max(300).optional(),
   linkUrl: z.string().trim().max(300).optional().default(''),
   isActive: z.boolean().optional().default(true),
 });
