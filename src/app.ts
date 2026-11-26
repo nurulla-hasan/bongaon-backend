@@ -17,13 +17,26 @@ app.set('trust proxy', 1);
 app.disable('x-powered-by');
 
 const rawOrigin = config.frontend_url || 'http://localhost:3000';
-const allowedOrigins = new Set([
-  rawOrigin,
-  'http://localhost:3000',
-  'http://localhost:3010',
-  'http://127.0.0.1:3000',
-  'http://127.0.0.1:3010',
-]);
+const normalizeOrigin = (value: string) => value.trim().replace(/\/+$/, '');
+
+const extraOrigins = (config.allowed_origins || '')
+  .split(',')
+  .map(normalizeOrigin)
+  .filter(Boolean);
+
+const allowedOrigins = new Set(
+  [
+    rawOrigin,
+    config.dashboard_url || '',
+    ...extraOrigins,
+    'http://localhost:3000',
+    'http://localhost:3010',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:3010',
+  ]
+    .map(normalizeOrigin)
+    .filter(Boolean),
+);
 
 if (rawOrigin.includes('.sslip.io')) {
   allowedOrigins.add(rawOrigin.replace('.sslip.io', ''));

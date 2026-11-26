@@ -3,3 +3,6 @@ dist
 generated
 .env
 *.log
+
+.vercel
+.env*
