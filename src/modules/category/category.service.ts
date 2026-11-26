@@ -47,6 +47,26 @@ const CATEGORY_ORDER_BY_MAP: Record<string, Prisma.CategoryOrderByWithRelationIn
   name_desc: [{ name: 'desc' }],
 };
 
+const syncSortOrdersAround = async (
+  tx: Prisma.TransactionClient,
+  others: Array<{ id: string; sortOrder: number }>,
+  targetPos: number,
+): Promise<void> => {
+  let order = 1;
+  for (const item of others) {
+    if (order === targetPos) {
+      order += 1;
+    }
+    if (item.sortOrder !== order) {
+      await tx.category.update({
+        where: { id: item.id },
+        data: { sortOrder: order },
+      });
+    }
+    order += 1;
+  }
+};
+
 const createCategoryIntoDB = async (payload: CreateCategoryInput) => {
   const slug = payload.slug || generateSlug(payload.name);
 
@@ -68,16 +88,30 @@ const createCategoryIntoDB = async (payload: CreateCategoryInput) => {
     );
   }
 
-  const category = await prisma.category.create({
-    data: {
-      name: payload.name,
-      slug,
-      subtitle: payload.subtitle ?? '',
-      sortOrder: payload.sortOrder ?? 0,
-      isActive: payload.isActive ?? true,
-      showOnHome: payload.showOnHome ?? false,
-    },
-    select: CATEGORY_PUBLIC_SELECT,
+  const category = await prisma.$transaction(async (tx) => {
+    const others = await tx.category.findMany({
+      orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+      select: { id: true, sortOrder: true },
+    });
+
+    const targetPos =
+      payload.sortOrder !== undefined && payload.sortOrder > 0
+        ? Math.min(payload.sortOrder, others.length + 1)
+        : others.length + 1;
+
+    await syncSortOrdersAround(tx, others, targetPos);
+
+    return tx.category.create({
+      data: {
+        name: payload.name,
+        slug,
+        subtitle: payload.subtitle ?? '',
+        sortOrder: targetPos,
+        isActive: payload.isActive ?? true,
+        showOnHome: payload.showOnHome ?? false,
+      },
+      select: CATEGORY_PUBLIC_SELECT,
+    });
   });
 
   return category;
@@ -182,13 +216,39 @@ const updateCategoryIntoDB = async (id: string, payload: UpdateCategoryInput) =>
     }
   }
 
+  if (payload.sortOrder !== undefined) {
+    const requestedOrder = payload.sortOrder;
+    return prisma.$transaction(async (tx) => {
+      const others = await tx.category.findMany({
+        where: { id: { not: id } },
+        orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+        select: { id: true, sortOrder: true },
+      });
+
+      const targetPos = Math.max(1, Math.min(requestedOrder, others.length + 1));
+      await syncSortOrdersAround(tx, others, targetPos);
+
+      return tx.category.update({
+        where: { id },
+        data: {
+          ...(payload.name !== undefined && { name: payload.name }),
+          ...(nextSlug !== undefined && { slug: nextSlug }),
+          ...(payload.subtitle !== undefined && { subtitle: payload.subtitle }),
+          sortOrder: targetPos,
+          ...(payload.isActive !== undefined && { isActive: payload.isActive }),
+          ...(payload.showOnHome !== undefined && { showOnHome: payload.showOnHome }),
+        },
+        select: CATEGORY_PUBLIC_SELECT,
+      });
+    });
+  }
+
   const updatedCategory = await prisma.category.update({
     where: { id },
     data: {
       ...(payload.name !== undefined && { name: payload.name }),
       ...(nextSlug !== undefined && { slug: nextSlug }),
       ...(payload.subtitle !== undefined && { subtitle: payload.subtitle }),
-      ...(payload.sortOrder !== undefined && { sortOrder: payload.sortOrder }),
       ...(payload.isActive !== undefined && { isActive: payload.isActive }),
       ...(payload.showOnHome !== undefined && { showOnHome: payload.showOnHome }),
     },
